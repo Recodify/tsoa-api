@@ -21,7 +21,7 @@
     "clean": "rm -rf ./dist",
     "env:dev": "cross-env NODE_ENV=development",
     "env:test": "cross-env NODE_ENV=test",
-    "sequelize:dev": "yarn env:dev sequelize",
+    "sequelize:dev": "yarn env:dev sequelize db:migrate",
     "sequelize:test": "yarn env:test sequelize"
   },
   "author": "Daniel Isaac Geslin <dgeslin@makingsense.com> (https://www.linkedin.com/in/danielisaacgeslin/)",

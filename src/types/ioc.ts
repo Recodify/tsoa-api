@@ -1,5 +1,6 @@
 const TYPES = {
-  UserModel: Symbol('UserModel')
+  UserModel: Symbol('UserModel'),
+  ModelFactory: Symbol('IModelFactory')
 };
 
 export { TYPES };

@@ -18,8 +18,9 @@ export class Models {
   }
 
   private loadModels() {
-    const userModel: UserModel = UserModelFactory(this.sequelize, this.sequelize.Sequelize);
-    iocContainer.bind<UserModel>(TYPES.UserModel).toConstantValue(userModel);
+    const factory = new UserModelFactory();
+    const userModel: UserModel = factory.create(this.sequelize, this.sequelize.Sequelize);
+    iocContainer.bind<UserModel>(TYPES.UserModel).toConstantValue(userModel);    
   }
 
   private setupAssociations() {
