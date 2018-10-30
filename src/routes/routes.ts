@@ -2,6 +2,7 @@
 import { Controller, ValidateParam, FieldErrors, ValidateError, TsoaRoute } from 'tsoa';
 import { iocContainer } from './../config/ioc';
 import { UserController } from './../controllers/user';
+import { AuthController } from './../controllers/auth';
 import { expressAuthentication } from './../authentication/authentication';
 
 const models: TsoaRoute.Models = {
@@ -9,6 +10,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "email": { "dataType": "string", "required": true, "validators": { "pattern": { "value": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$" } } },
             "name": { "dataType": "string", "required": true, "validators": { "minLength": { "value": 1 } } },
+            "role": { "dataType": "string", "required": true },
+            "password": { "dataType": "string" },
             "id": { "dataType": "double" },
             "createdAt": { "dataType": "datetime" },
             "updatedAt": { "dataType": "datetime" },
@@ -20,19 +23,41 @@ const models: TsoaRoute.Models = {
             "items": { "dataType": "array", "array": { "ref": "UserAttributes" }, "required": true },
         },
     },
+    "UserCreateRequest": {
+        "properties": {
+            "email": { "dataType": "string", "required": true, "validators": { "pattern": { "value": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$" } } },
+            "name": { "dataType": "string", "required": true, "validators": { "minLength": { "value": 1 } } },
+            "role": { "dataType": "string", "required": true },
+            "password": { "dataType": "string", "required": true },
+        },
+    },
     "UserRequestData": {
         "properties": {
             "email": { "dataType": "string", "required": true, "validators": { "pattern": { "value": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$" } } },
             "name": { "dataType": "string", "required": true, "validators": { "minLength": { "value": 1 } } },
+            "role": { "dataType": "string", "required": true },
+            "password": { "dataType": "string" },
+        },
+    },
+    "AuthResponse": {
+        "properties": {
+            "token": { "dataType": "string", "required": true },
+        },
+    },
+    "LoginRequest": {
+        "properties": {
+            "email": { "dataType": "string", "required": true, "validators": { "pattern": { "value": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$" } } },
+            "password": { "dataType": "string", "required": true, "validators": { "minLength": { "value": 1 } } },
         },
     },
 };
 
 export function RegisterRoutes(app: any) {
     app.get('/service/users/:id',
+        authenticateMiddleware([{ "jwt": ["user:read"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                id: { "in": "path", "name": "id", "required": true, "dataType": "integer", "validators": { "isInt": { "errorMsg": "id" } } },
+                id: { "in": "path", "name": "id", "required": true, "dataType": "double" },
             };
 
             let validatedArgs: any[] = [];
@@ -52,13 +77,14 @@ export function RegisterRoutes(app: any) {
             promiseHandler(controller, promise, response, next);
         });
     app.get('/service/users',
+        authenticateMiddleware([{ "jwt": ["user:read"] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 page: { "in": "query", "name": "page", "dataType": "integer", "validators": { "isInt": { "errorMsg": "page" }, "minimum": { "value": 1 } } },
                 limit: { "in": "query", "name": "limit", "dataType": "integer", "validators": { "isInt": { "errorMsg": "limit" }, "minimum": { "value": 1 }, "maximum": { "value": 100 } } },
                 query: { "in": "query", "name": "query", "dataType": "string", "validators": { "isString": { "errorMsg": "query" } } },
                 sortBy: { "in": "query", "name": "sortBy", "dataType": "string", "validators": { "isString": { "errorMsg": "sortBy" } } },
-                sortDirection: { "in": "query", "name": "sortDirection", "dataType": "enum", "enums": ["ASC", "DESC"] },
+                sortDirection: { "in": "query", "name": "sortDirection", "dataType": "enum", "enums": ["ASC", "DESC"], "validators": { "pattern": { "value": "^ASC|DESC$" } } },
             };
 
             let validatedArgs: any[] = [];
@@ -78,10 +104,10 @@ export function RegisterRoutes(app: any) {
             promiseHandler(controller, promise, response, next);
         });
     app.post('/service/users',
-        authenticateMiddleware([{ "admin": [] }]),
+        authenticateMiddleware([{ "jwt": ["user:write"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                body: { "in": "body", "name": "body", "required": true, "ref": "UserRequestData" },
+                body: { "in": "body", "name": "body", "required": true, "ref": "UserCreateRequest" },
             };
 
             let validatedArgs: any[] = [];
@@ -101,10 +127,10 @@ export function RegisterRoutes(app: any) {
             promiseHandler(controller, promise, response, next);
         });
     app.put('/service/users/:id',
-        authenticateMiddleware([{ "admin": [] }]),
+        authenticateMiddleware([{ "jwt": ["user:write"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                id: { "in": "path", "name": "id", "required": true, "dataType": "integer", "validators": { "isInt": { "errorMsg": "id" } } },
+                id: { "in": "path", "name": "id", "required": true, "dataType": "double", "validators": { "pattern": { "value": "^[A-Fa-f\\d]{24}$" } } },
                 body: { "in": "body", "name": "body", "required": true, "ref": "UserRequestData" },
             };
 
@@ -125,10 +151,10 @@ export function RegisterRoutes(app: any) {
             promiseHandler(controller, promise, response, next);
         });
     app.delete('/service/users/:id',
-        authenticateMiddleware([{ "admin": [] }]),
+        authenticateMiddleware([{ "jwt": ["user:write"] }]),
         function(request: any, response: any, next: any) {
             const args = {
-                id: { "in": "path", "name": "id", "required": true, "dataType": "integer", "validators": { "isInt": { "errorMsg": "id" } } },
+                id: { "in": "path", "name": "id", "required": true, "dataType": "double", "validators": { "pattern": { "value": "^[A-Fa-f\\d]{24}$" } } },
             };
 
             let validatedArgs: any[] = [];
@@ -145,6 +171,28 @@ export function RegisterRoutes(app: any) {
 
 
             const promise = controller.delete.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, next);
+        });
+    app.post('/service/auth',
+        function(request: any, response: any, next: any) {
+            const args = {
+                body: { "in": "body", "name": "body", "required": true, "ref": "LoginRequest" },
+            };
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = iocContainer.get<AuthController>(AuthController);
+            if (typeof controller['setStatus'] === 'function') {
+                (<any>controller).setStatus(undefined);
+            }
+
+
+            const promise = controller.login.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, next);
         });
 

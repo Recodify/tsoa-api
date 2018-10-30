@@ -15,6 +15,13 @@
 					"type": "string",
 					"minLength": 1
 				},
+				"role": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string",
+					"x-nullable": true
+				},
 				"id": {
 					"type": "number",
 					"format": "double",
@@ -33,7 +40,8 @@
 			},
 			"required": [
 				"email",
-				"name"
+				"name",
+				"role"
 			],
 			"type": "object"
 		},
@@ -56,6 +64,32 @@
 			],
 			"type": "object"
 		},
+		"UserCreateRequest": {
+			"properties": {
+				"email": {
+					"type": "string",
+					"format": "email",
+					"pattern": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+				},
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"role": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"email",
+				"name",
+				"role",
+				"password"
+			],
+			"type": "object"
+		},
 		"UserRequestData": {
 			"properties": {
 				"email": {
@@ -66,11 +100,48 @@
 				"name": {
 					"type": "string",
 					"minLength": 1
+				},
+				"role": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string",
+					"x-nullable": true
 				}
 			},
 			"required": [
 				"email",
-				"name"
+				"name",
+				"role"
+			],
+			"type": "object"
+		},
+		"AuthResponse": {
+			"properties": {
+				"token": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"token"
+			],
+			"type": "object"
+		},
+		"LoginRequest": {
+			"properties": {
+				"email": {
+					"type": "string",
+					"format": "email",
+					"pattern": "^[a-zA-Z0-9_.+-]+\\x40[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+				},
+				"password": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"email",
+				"password"
 			],
 			"type": "object"
 		}
@@ -95,19 +166,37 @@
 						"schema": {
 							"$ref": "#/definitions/UserAttributes"
 						}
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
 					}
 				},
 				"tags": [
 					"users"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"user:read"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
 						"name": "id",
 						"required": true,
-						"format": "int32",
-						"type": "integer"
+						"format": "double",
+						"type": "number"
 					}
 				]
 			},
@@ -125,6 +214,15 @@
 					},
 					"400": {
 						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
 					}
 				},
 				"tags": [
@@ -132,7 +230,9 @@
 				],
 				"security": [
 					{
-						"admin": []
+						"jwt": [
+							"user:write"
+						]
 					}
 				],
 				"parameters": [
@@ -140,8 +240,9 @@
 						"in": "path",
 						"name": "id",
 						"required": true,
-						"format": "int32",
-						"type": "integer"
+						"format": "double",
+						"type": "number",
+						"pattern": "^[A-Fa-f\\d]{24}$"
 					},
 					{
 						"in": "body",
@@ -161,6 +262,18 @@
 				"responses": {
 					"204": {
 						"description": "No content"
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
 					}
 				},
 				"tags": [
@@ -168,7 +281,9 @@
 				],
 				"security": [
 					{
-						"admin": []
+						"jwt": [
+							"user:write"
+						]
 					}
 				],
 				"parameters": [
@@ -176,8 +291,9 @@
 						"in": "path",
 						"name": "id",
 						"required": true,
-						"format": "int32",
-						"type": "integer"
+						"format": "double",
+						"type": "number",
+						"pattern": "^[A-Fa-f\\d]{24}$"
 					}
 				]
 			}
@@ -197,12 +313,24 @@
 					},
 					"400": {
 						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
 					}
 				},
 				"tags": [
 					"users"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"user:read"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "query",
@@ -241,7 +369,8 @@
 						"enum": [
 							"ASC",
 							"DESC"
-						]
+						],
+						"pattern": "^ASC|DESC$"
 					}
 				]
 			},
@@ -259,6 +388,12 @@
 					},
 					"400": {
 						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
 					}
 				},
 				"tags": [
@@ -266,7 +401,9 @@
 				],
 				"security": [
 					{
-						"admin": []
+						"jwt": [
+							"user:write"
+						]
 					}
 				],
 				"parameters": [
@@ -275,7 +412,43 @@
 						"name": "body",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/UserRequestData"
+							"$ref": "#/definitions/UserCreateRequest"
+						}
+					}
+				]
+			}
+		},
+		"/auth": {
+			"post": {
+				"operationId": "Login",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/AuthResponse"
+						}
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"tags": [
+					"auth"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/LoginRequest"
 						}
 					}
 				]
@@ -286,5 +459,11 @@
 		"application/json"
 	],
 	"swagger": "2.0",
-	"securityDefinitions": {}
+	"securityDefinitions": {
+		"jwt": {
+			"type": "apiKey",
+			"name": "Authorization",
+			"in": "header"
+		}
+	}
 }

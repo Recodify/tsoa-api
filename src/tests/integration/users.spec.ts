@@ -15,7 +15,8 @@ describe(`${entityName} - ${route}`, () => {
     it(`should create`, async () => {
       const userRequest: UserRequestData = {
         email: 'test@email.com',
-        name: 'Test Name'
+        name: 'Test Name',
+        role: ''
       };
 
       const res = await integrationHelper.app.post(route).send(userRequest);
@@ -35,7 +36,8 @@ describe(`${entityName} - ${route}`, () => {
     it(`should fail to create if invalid params`, async () => {
       const userRequest: UserRequestData = {
         email: 'invalid',
-        name: 'Test Name'
+        name: 'Test Name',
+        role: ''
       };
 
       const res = await integrationHelper.app.post(route).send(userRequest);
@@ -49,7 +51,8 @@ describe(`${entityName} - ${route}`, () => {
 
       const userRequest: UserRequestData = {
         email: 'test@email.com',
-        name: 'Test Name'
+        name: 'Test Name',
+        role: ''
       };
 
       const res = await integrationHelper.app.put(`${route}/${user.id}`).send(userRequest);
@@ -62,7 +65,8 @@ describe(`${entityName} - ${route}`, () => {
     it(`should fail to update if missing`, async () => {
       const userRequest: UserRequestData = {
         email: 'test@email.com',
-        name: 'Test Name'
+        name: 'Test Name',
+        role: ''
       };
 
       const res = await integrationHelper.app.put(`${route}/111111111`).send(userRequest);

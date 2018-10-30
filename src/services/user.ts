@@ -2,10 +2,11 @@ import { Op, FindOptions } from 'sequelize';
 
 import { ProvideSingleton, inject } from '../config/ioc';
 import { UserInstance, UserModel } from '../models/user';
-import { NotFound } from '../types/api-error';
+import { NotFound, Unauthorized } from '../types/api-error';
 import { UserRequestData } from '../types/user';
 import { TYPES } from '../types/ioc';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
+import { LoginRequest } from '../types/authentication';
 
 @ProvideSingleton(UserService)
 export class UserService {
@@ -64,4 +65,19 @@ export class UserService {
 
     return { count, items: rows };
   }
+
+  public async authenticate(login: LoginRequest) {      
+    const user = await this.userModel.findOne({where: {email: login.email}})
+      
+    if (! user) {
+      throw new Unauthorized();
+    }
+    // TODO: implement check here
+    const result = true;//await user.checkPassword(login.password);
+    if (! result) {
+      throw new Unauthorized();
+    }
+    return user;
+  }
 }
+

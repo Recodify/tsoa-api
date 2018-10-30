@@ -14,5 +14,13 @@ export default {
     host: env.SQL_HOST,
     port: Number(env.SQL_PORT),
     dialect: env.SQL_DIALECT
+  },
+  jwt: {
+    secret: env.JWT_SECRET || 'secret',
+    expiration: env.JWT_EXPIRATION || '2h',
+    algorithm: env.JWT_ALGORITHM || 'HS256'
+  },
+  password: {
+    saltOrRounds: env.SALT_OR_ROUNDS || 10
   }
 };

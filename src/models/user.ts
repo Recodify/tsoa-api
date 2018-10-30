@@ -16,7 +16,9 @@ export class UserModelFactory implements IModelFactory<UserModel> {
   public create(sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): UserModel {
     const model = sequelize.define<UserInstance, UserAttributes>('User', {
       name: DataTypes.STRING,
-      email: { type: DataTypes.STRING, unique: true }
+      email: { type: DataTypes.STRING, unique: true },
+      role: { type: DataTypes.STRING },
+      password: {type: DataTypes.STRING}
     }, {});
 
     model.associate = function (models: Sequelize.Models) {
