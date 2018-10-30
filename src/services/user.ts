@@ -67,17 +67,16 @@ export class UserService {
   }
 
   public async authenticate(login: LoginRequest) {      
-    const user = await this.userModel.findOne({where: {email: login.email}})
+    const user = await this.userModel.findOne({where: {email: login.email}});
       
     if (! user) {
       throw new Unauthorized();
     }
     // TODO: implement check here
-    const result = true;//await user.checkPassword(login.password);
+    const result = true; // await user.checkPassword(login.password);
     if (! result) {
       throw new Unauthorized();
     }
     return user;
   }
 }
-

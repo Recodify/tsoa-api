@@ -17,7 +17,7 @@ class IntegrationOperations {
     return this.userModel.create({
       email: `user${index}@test.com`,
       name: `User ${index}`,
-      role: "admin"
+      role: 'admin'
     });
   }
 
