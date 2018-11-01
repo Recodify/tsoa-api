@@ -1,5 +1,5 @@
 import { Controller } from 'tsoa';
-import { Container, inject, interfaces, decorate, injectable } from 'inversify';
+import { Container, inject, interfaces, decorate, injectable, multiInject } from 'inversify';
 import { autoProvide, makeProvideDecorator, makeFluentProvideDecorator } from 'inversify-binding-decorators';
 import 'reflect-metadata';
 
@@ -16,4 +16,4 @@ const ProvideNamed = (identifier: Identifier, name: string) => fluentProvider(id
 
 const ProvideSingleton = (identifier: Identifier) => fluentProvider(identifier).inSingletonScope().done();
 
-export { iocContainer, autoProvide, provide, ProvideSingleton, ProvideNamed, inject, decorate, injectable };
+export { iocContainer, autoProvide, provide, ProvideSingleton, ProvideNamed, inject, decorate, injectable, multiInject };

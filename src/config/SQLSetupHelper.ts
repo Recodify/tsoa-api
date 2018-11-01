@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 
 import constants from './constants';
 import { Logger } from './Logger';
-import { ProvideSingleton, inject } from '../ioc';
+import { ProvideSingleton, inject, multiInject } from '../ioc';
 import { SQLDbConnection } from './SQLDbConnection';
 import * as entities from '../repositories/sql/entities';
 
@@ -11,8 +11,13 @@ export class SQLSetupHelper {
 
   constructor(
     @inject(SQLDbConnection) private sqlDbConnection: SQLDbConnection,
-    @inject(entities.UserEntity) private entity1: entities.UserEntity // tslint:disable-line
-  ) { }
+    @multiInject(entities.TYPES.IEntity) private entities: entities.IEntity[] // tslint:disable-line
+  ) {
+      entities.forEach(x => {
+        x.define();
+        x.associate();
+      });
+   }
 
   public async rawQuery<T>(query: string): Promise<T> {
     return this.sqlDbConnection.db.query(query, { raw: true });
