@@ -14,11 +14,12 @@ const fluentProvider = makeFluentProvideDecorator(iocContainer);
 
 const ProvideNamed = (identifier: Identifier, name: string) => {
    return fluentProvider(identifier).whenTargetNamed(name).done();
-}
+};
 
 const ProvideSingleton = (identifier: Identifier) => {
      console.log(identifier);
      return fluentProvider(identifier).inSingletonScope().done();
-}
+};
 
-export { iocContainer, autoProvide, provide, ProvideSingleton, ProvideNamed, inject, decorate, injectable, multiInject, };
+export { iocContainer, autoProvide, provide, ProvideSingleton, 
+    ProvideNamed, inject, decorate, injectable, multiInject, };

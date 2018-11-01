@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 
-import { ProvideSingleton, inject, provide, injectable } from '../../../ioc';
+import { ProvideSingleton, inject } from '../../../ioc';
 import { SQLDbConnection } from '../../../config/SQLDbConnection';
 import { BaseEntity } from './BaseEntity';
 import { TYPES } from './TYPES';

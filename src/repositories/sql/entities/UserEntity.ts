@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 
-import { ProvideSingleton, inject, provide, injectable } from '../../../ioc';
+import { ProvideSingleton, inject } from '../../../ioc';
 import { SQLDbConnection } from '../../../config/SQLDbConnection';
 import { BaseEntity } from './BaseEntity';
 import { TYPES } from './TYPES';
@@ -13,9 +13,9 @@ export class UserEntity extends BaseEntity {
     name: { type: Sequelize.STRING, allowNull: false },
     email: { type: Sequelize.STRING, allowNull: false, unique: true }
   };
-  protected options: Sequelize.DefineOptions<any> = { name: { plural: 'users' } }; 
+  protected options: Sequelize.DefineOptions<any> = { name: { plural: 'users' } };
 
   constructor(@inject(SQLDbConnection) protected sqlDbConnection: SQLDbConnection) {
-    super();    
-  }  
+    super();
+  }
 }
