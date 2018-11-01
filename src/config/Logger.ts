@@ -38,9 +38,20 @@ export class Logger {
     if (Logger.shouldLog) Logger.console.verbose(Logger.formatArgs(args));
   }
 
+  private static replaceErrors(key, value) {
+    if (value instanceof Error) {
+        var error = {};
+        Object.getOwnPropertyNames(value).forEach(function (k) {
+            error[k] = value[k];
+        });
+        return error;
+    }
+    return value;
+  }
+
   private static formatArgs(args: any[]): string {
-    if (args.length <= 1) args = args[0];
-    return JSON.stringify(args, null, 4);
+    if (args.length <= 1) args = args[0];    
+    return JSON.stringify(args, this.replaceErrors, 4);
   }
 
 }

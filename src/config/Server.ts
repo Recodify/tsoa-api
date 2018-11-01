@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
 import { config as AWSConfig } from 'aws-sdk';
 
+import {Container} from 'inversify';
 import constants from './constants';
 import { ErrorHandler } from './ErrorHandler';
 import { RegisterRoutes } from '../../build/routes';
@@ -15,6 +16,7 @@ import '../controllers';
 export class Server {
   public app: express.Express = express();
   private readonly port: number = constants.port;
+  private container:any;
 
   constructor() {
     AWSConfig.update({ accessKeyId: constants.AWS.accessKeyId, secretAccessKey: constants.AWS.secretAccessKey });
@@ -28,15 +30,20 @@ export class Server {
     const swaggerDocument = require('../../build/swagger/swagger.json');
 
     this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    this.container = iocContainer;
   }
 
   public async listen(port: number = this.port) {
     process.on('uncaughtException', this.criticalErrorHandler);
     process.on('unhandledRejection', this.criticalErrorHandler);
-    const sqlHelper = iocContainer.get<SQLSetupHelper>(SQLSetupHelper);
+    const sqlHelper = iocContainer.get<SQLSetupHelper>(SQLSetupHelper);    
     await sqlHelper.sync({ force: false });
     const listen = this.app.listen(this.port);
-    Logger.info(`${constants.environment} server running on port: ${this.port}`);
+    Logger.info(`${constants.environment} server running on port: ${this.port}`);      
+
+    console.log(Array.from(this.container._bindingDictionary._map.entries()))
+
     return listen;
   }
 
